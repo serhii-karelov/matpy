@@ -1,0 +1,51 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_EXCMD	mixed	/number, pattern, mixed, or combineV2/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
+!_TAG_PROC_CWD	/home/serhii/my_path/competence/matmul/posts/1. Speeding up Python/code/2/matpy_1/	//
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	5.9.0	//
+MatrixError	matpy.c	/^static PyObject* MatrixError;$/;"	v	typeref:typename:PyObject *	file:
+MatrixObject	matpy.c	/^} MatrixObject; $/;"	t	typeref:struct:__anonb5026e810108	file:
+MatrixType	matpy.c	/^static PyTypeObject MatrixType = {$/;"	v	typeref:typename:PyTypeObject	file:
+MatrixType	matpy.c	/^static PyTypeObject MatrixType;$/;"	v	typeref:typename:PyTypeObject	file:
+PY_SSIZE_T_CLEAN	matpy.c	/^#define PY_SSIZE_T_CLEAN$/;"	d	file:
+PyInit_matpy	matpy.c	/^PyMODINIT_FUNC PyInit_matpy(void) {$/;"	f	typeref:typename:PyMODINIT_FUNC
+__anonb5026e810108	matpy.c	/^typedef struct {$/;"	s	file:
+_pymatrix_create	matpy.c	/^static PyObject* _pymatrix_create(PyTypeObject* type, int rows, int cols) {$/;"	f	typeref:typename:PyObject *	file:
+_pymatrix_init_empty	matpy.c	/^static int _pymatrix_init_empty(PyObject* mat, int rows, int cols) {$/;"	f	typeref:typename:int	file:
+check_dimensions	matrix.c	/^static int check_dimensions(Matrix* m1, Matrix* m2, Matrix* m3) {$/;"	f	typeref:typename:int	file:
+matpymodule	matpy.c	/^static struct PyModuleDef matpymodule = {$/;"	v	typeref:struct:PyModuleDef	file:
+matrix	matpy.c	/^  Matrix* matrix;$/;"	m	struct:__anonb5026e810108	typeref:typename:PyObject_HEAD Matrix *	file:
+matrix_add	matrix.c	/^int matrix_add(Matrix* result, Matrix* m1, Matrix* m2) {$/;"	f	typeref:typename:int
+matrix_alloc	matrix.c	/^int matrix_alloc(Matrix** m, int rows, int cols) {$/;"	f	typeref:typename:int
+matrix_dealloc	matrix.c	/^void matrix_dealloc(Matrix* m) {$/;"	f	typeref:typename:void
+matrix_elementwise	matrix.c	/^static double matrix_elementwise(Matrix* result, Matrix* m1, Matrix* m2, double (*op)(double, do/;"	f	typeref:typename:double	file:
+matrix_fill	matrix.c	/^void matrix_fill(Matrix* m, double x) {$/;"	f	typeref:typename:void
+matrix_fill_rand	matrix.c	/^void matrix_fill_rand(Matrix* m, int seed) {$/;"	f	typeref:typename:void
+matrix_get	matrix.c	/^double matrix_get(Matrix* m, int i, int j) {$/;"	f	typeref:typename:double
+matrix_matmul	matrix.c	/^int matrix_matmul(Matrix* result, Matrix* m1, Matrix* m2) {$/;"	f	typeref:typename:int
+matrix_mul	matrix.c	/^int matrix_mul(Matrix* result, Matrix* m1, Matrix* m2) {$/;"	f	typeref:typename:int
+matrix_set	matrix.c	/^void matrix_set(Matrix* m, int i, int j, double x) {$/;"	f	typeref:typename:void
+matrix_sub	matrix.c	/^int matrix_sub(Matrix* result, Matrix* m1, Matrix* m2) {$/;"	f	typeref:typename:int
+op_add	matrix.c	/^static double op_add(double a, double b) {$/;"	f	typeref:typename:double	file:
+op_mul	matrix.c	/^static double op_mul(double a, double b) {$/;"	f	typeref:typename:double	file:
+op_sub	matrix.c	/^static double op_sub(double a, double b) {$/;"	f	typeref:typename:double	file:
+pymatrix_add	matpy.c	/^PyObject* pymatrix_add(PyObject* self, PyObject* other) {$/;"	f	typeref:typename:PyObject *
+pymatrix_as_list	matpy.c	/^PyObject* pymatrix_as_list(PyObject* self, PyObject* Py_UNUSED(ignored)) {$/;"	f	typeref:typename:PyObject *
+pymatrix_as_number	matpy.c	/^static PyNumberMethods pymatrix_as_number = {$/;"	v	typeref:typename:PyNumberMethods	file:
+pymatrix_dealloc	matpy.c	/^void pymatrix_dealloc(PyObject* self) {$/;"	f	typeref:typename:void
+pymatrix_elementwise	matpy.c	/^static PyObject* pymatrix_elementwise(PyObject* self, PyObject* other, int (*op)(Matrix*, Matrix/;"	f	typeref:typename:PyObject *	file:
+pymatrix_fill	matpy.c	/^PyObject* pymatrix_fill(PyTypeObject* type, PyObject* args) {$/;"	f	typeref:typename:PyObject *
+pymatrix_init	matpy.c	/^static int pymatrix_init(PyObject *self, PyObject* args, PyObject* kwagrs) {$/;"	f	typeref:typename:int	file:
+pymatrix_matmul	matpy.c	/^PyObject* pymatrix_matmul(PyObject* self, PyObject* other) {$/;"	f	typeref:typename:PyObject *
+pymatrix_members	matpy.c	/^static PyMemberDef pymatrix_members[] = {$/;"	v	typeref:typename:PyMemberDef[]	file:
+pymatrix_methods	matpy.c	/^static PyMethodDef pymatrix_methods[] = {$/;"	v	typeref:typename:PyMethodDef[]	file:
+pymatrix_mul	matpy.c	/^PyObject* pymatrix_mul(PyObject* self, PyObject* other) {$/;"	f	typeref:typename:PyObject *
+pymatrix_rand	matpy.c	/^PyObject* pymatrix_rand(PyTypeObject* type, PyObject* args, PyObject* kw) {$/;"	f	typeref:typename:PyObject *
+pymatrix_sub	matpy.c	/^PyObject* pymatrix_sub(PyObject* self, PyObject* other) {$/;"	f	typeref:typename:PyObject *
+shape	matpy.c	/^  PyObject* shape;$/;"	m	struct:__anonb5026e810108	typeref:typename:PyObject *	file:

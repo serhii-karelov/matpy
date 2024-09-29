@@ -1,0 +1,12 @@
+[project]
+name = "matpy"
+version = "0.0.1"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+ext-modules = [
+  {name = "matpy", sources = ["matrix.c", "matpy.c"], extra-compile-args = ["-Wall", "-Wextra", "-Og"]}
+]
