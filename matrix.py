@@ -1,7 +1,7 @@
 import operator 
 from timeit import timeit
 from copy import deepcopy
-from random import random 
+import random 
 
 class Matrix:
     def __init__(self, items, steal=False):
@@ -24,6 +24,19 @@ class Matrix:
             for j in range(cols):
                 items[i][j] = value
         return cls(items, steal=True)
+
+    @classmethod
+    def rand(cls, rows, cols, seed=1):
+        random.seed(seed)
+        items = [None] * rows
+        for i in range(rows):
+            items[i] = [0] * cols 
+            for j in range(cols):
+                items[i][j] = random.random()
+        return cls(items, steal=True)
+
+    def as_list(self):
+        return deepcopy(self._items)
 
     def _elementwise(self, other, op):
         if self.shape != other.shape:
@@ -59,7 +72,7 @@ class Matrix:
     def __repr__(self):
         return f'Matrix({self._items})'
 
-
+"""
 m1 = Matrix.fill(1000, 1000, 800.1)
 m2 = Matrix.fill(1000, 1000, 900.1)
 
@@ -67,4 +80,4 @@ m2 = Matrix.fill(1000, 1000, 900.1)
 #print(" matmul is done in %f s" % timeit(lambda: mv1 @ mv2, number=1))
 print(" add is done in %f s" % timeit(lambda: m1 + m2, number=1))
 print(" add is done in %f s" % timeit(lambda: m1 @ m2, number=1))
-
+"""

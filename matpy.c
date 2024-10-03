@@ -3,15 +3,12 @@
 #include <stddef.h>
 #include "matrix.h"
 
-/* TODO: Rename Matrix to CMatrix
- *
- * */
 static PyObject* MatrixError;
 static PyTypeObject MatrixType;
 
 typedef struct {
   PyObject_HEAD
-  Matrix* matrix;
+  CMatrix* matrix;
   PyObject* shape;
 } MatrixObject; 
 
@@ -28,7 +25,7 @@ void pymatrix_dealloc(PyObject* self) {
  * */
 static int _pymatrix_init_empty(PyObject* mat, int rows, int cols) {
   MatrixObject* m = (MatrixObject* ) mat;
-  Matrix* matrix;
+  CMatrix* matrix;
   if (matrix_alloc(&matrix, rows, cols)) {
     PyErr_NoMemory();
     return -1;
@@ -58,9 +55,9 @@ static PyObject* _pymatrix_construct(PyTypeObject* type, int rows, int cols) {
   }
   return m;
 }
-static PyObject* pymatrix_elementwise(PyObject* self, PyObject* other, int (*op)(Matrix*, Matrix*, Matrix*)) {
-  Matrix* m1 = ((MatrixObject*) self)->matrix;
-  Matrix* m2 = ((MatrixObject*) other)->matrix;
+static PyObject* pymatrix_elementwise(PyObject* self, PyObject* other, int (*op)(CMatrix*, CMatrix*, CMatrix*)) {
+  CMatrix* m1 = ((MatrixObject*) self)->matrix;
+  CMatrix* m2 = ((MatrixObject*) other)->matrix;
   if (!(m1->rows == m2->rows) && (m1->cols == m2->cols)) {
     PyErr_SetString(MatrixError, "Dimensions mismatch");
     return NULL;
@@ -86,8 +83,8 @@ PyObject* pymatrix_mul(PyObject* self, PyObject* other) {
 }
 
 PyObject* pymatrix_matmul(PyObject* self, PyObject* other) {
-  Matrix* m1 = ((MatrixObject*) self)->matrix;
-  Matrix* m2 = ((MatrixObject*) other)->matrix;
+  CMatrix* m1 = ((MatrixObject*) self)->matrix;
+  CMatrix* m2 = ((MatrixObject*) other)->matrix;
   if (!(m1->cols == m2->rows)) {
     PyErr_SetString(MatrixError, "Dimensions mismatch");
     return NULL;
@@ -99,6 +96,40 @@ PyObject* pymatrix_matmul(PyObject* self, PyObject* other) {
   matrix_matmul(((MatrixObject*) result)->matrix, m1, m2);
   return result;
 }
+/**** START MATMUL VARIANTS ****/
+
+#define _mmul(suffix) int _matrix_matmul_##suffix(CMatrix* result, CMatrix* m1, CMatrix* m2); \ 
+PyObject* _pymatrix_matmul_ ## suffix(PyObject* self, PyObject* other) { \
+  return _pymatrix_matmul_general(self, other, _matrix_matmul_ ## suffix); \
+}
+#define _mmul_meth(suffix) {"mul_" #suffix, (PyCFunction)  _pymatrix_matmul_ ## suffix, METH_O, ""}
+
+PyObject* _pymatrix_matmul_general(PyObject* self, PyObject* other, int (*mm_func)(CMatrix*, CMatrix*, CMatrix*) ) {
+
+  CMatrix* m1 = ((MatrixObject*) self)->matrix;
+  CMatrix* m2 = ((MatrixObject*) other)->matrix;
+  if (!(m1->cols == m2->rows)) {
+    PyErr_SetString(MatrixError, "Dimensions mismatch");
+    return NULL;
+  }
+  PyObject* result = _pymatrix_construct(&MatrixType, m1->rows, m2->cols);
+  if (result == NULL) {
+    return NULL;
+  }
+  mm_func(((MatrixObject*) result)->matrix, m1, m2);
+  return result;
+}
+
+
+_mmul(1_ijk)
+_mmul(2_kji)
+_mmul(2_jki)
+_mmul(3_kji_unrolled)
+_mmul(4_register_blocked)
+_mmul(5_loops)
+
+/**** END MATMUL VARIANTS ****/
+
 
 PyObject* pymatrix_fill(PyTypeObject* type, PyObject* args) {
   int rows, cols;
@@ -125,7 +156,7 @@ PyObject* pymatrix_rand(PyTypeObject* type, PyObject* args, PyObject* kw) {
 }
 
 PyObject* pymatrix_as_list(PyObject* self, PyObject* Py_UNUSED(ignored)) {
-  Matrix* matrix = ((MatrixObject*) self)->matrix;
+  CMatrix* matrix = ((MatrixObject*) self)->matrix;
   PyObject* rows = PyList_New(matrix->rows);
   PyObject* col;
   for (int i = 0; i < matrix->rows; i++) {
@@ -159,7 +190,7 @@ static int pymatrix_init(PyObject *self, PyObject* args, PyObject* kwagrs) {
   for (int i = 0; i < rows; i++) {
     row = PyList_GetItem(items_list, i); 
     for (int j = 0; j < cols; j++) {
-      item = PyLong_AsLong(PyList_GetItem(row, j));
+      item = PyFloat_AsDouble(PyList_GetItem(row, j));
       matrix_set(m->matrix, i, j, item);
     }
   }
@@ -172,6 +203,8 @@ static PyMemberDef pymatrix_members[] = {
   {NULL}, /* Terminator */
 };
 
+
+
 static PyMethodDef pymatrix_methods[] = {
   {"as_list", (PyCFunction) pymatrix_as_list,
     METH_NOARGS, "Return matrix items as list"},
@@ -179,6 +212,15 @@ static PyMethodDef pymatrix_methods[] = {
     METH_CLASS | METH_VARARGS, "Create matrix filled with the specified value"},
   {"rand", (PyCFunction) pymatrix_rand,
     METH_CLASS | METH_VARARGS | METH_KEYWORDS, "Create matrix filled with random values"},
+
+  /* DELETE from here */
+  _mmul_meth(1_ijk),
+  _mmul_meth(2_kji),
+  _mmul_meth(2_jki),
+  _mmul_meth(3_kji_unrolled),
+  _mmul_meth(4_register_blocked),
+  _mmul_meth(5_loops),
+  /* TO here */
   {NULL}, /* Terminator */
 };
 
@@ -211,7 +253,6 @@ static struct PyModuleDef matpymodule = {
 
 PyMODINIT_FUNC PyInit_matpy(void) {
   printf("Matpy is imported!\n");
-
   if (PyType_Ready(&MatrixType) < 0) { /* finish initialization of the type */
     return NULL;
   }

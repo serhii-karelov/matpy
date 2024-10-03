@@ -8,5 +8,5 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 ext-modules = [
-  {name = "matpy", sources = ["matrix.c", "matpy.c"], extra-compile-args = ["-Wall", "-Wextra", "-Og"]}
+  {name = "matpy", sources = ["matrix.c", "matpy.c"], extra-compile-args = ["-Wall", "-fopenmp", "-Wextra", "-O3", "-mavx2", "-march=native"], extra-link-args = ["-fopenmp", "-lpthread"]}
 ]
