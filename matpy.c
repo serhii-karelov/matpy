@@ -121,7 +121,7 @@ PyObject* _pymatrix_matmul_general(PyObject* self, PyObject* other, int (*mm_fun
 }
 
 
-_mmul(1_ijk)
+_mmul(1_ikj)
 _mmul(2_kji)
 _mmul(2_jki)
 _mmul(3_kji_unrolled)
@@ -214,7 +214,7 @@ static PyMethodDef pymatrix_methods[] = {
     METH_CLASS | METH_VARARGS | METH_KEYWORDS, "Create matrix filled with random values"},
 
   /* DELETE from here */
-  _mmul_meth(1_ijk),
+  _mmul_meth(1_ikj),
   _mmul_meth(2_kji),
   _mmul_meth(2_jki),
   _mmul_meth(3_kji_unrolled),

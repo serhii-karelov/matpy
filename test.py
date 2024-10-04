@@ -71,7 +71,7 @@ def test_large_matrix_matmul(Matrix):
 
 # TEST MATMUL VARIATIONS
 _VARIATION_METHODS = [
-    'mul_1_ijk',
+    'mul_1_ikj',
     'mul_2_kji',
     'mul_3_kji_unrolled',
     'mul_4_register_blocked',

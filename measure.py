@@ -31,8 +31,8 @@ def measure_numpy():
 
 # VARIATIONS START
 _VARIATION_METHODS = [
-    # 'mul_1_ijk',
-    #'mul_2_jki',
+    'mul_1_ikj',
+    #'mul_2_kji',
     # 'mul_2_kji',
     #'mul_3_kji_unrolled',
     'mul_4_register_blocked',
