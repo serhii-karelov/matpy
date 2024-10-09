@@ -21,7 +21,7 @@ def measure_matpy(times=1):
     return  time_mmul, time_add
 
 if __name__ == "__main__":
-    mmul, madd = measure_matpy(4)
+    mmul, madd = measure_matpy()
 
     print(f"matpy matmul matmul: {(mmul):.2f}s \t add: {madd:.3f}s")
 

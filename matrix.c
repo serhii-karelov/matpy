@@ -105,9 +105,9 @@ int matrix_matmul(CMatrix *result, CMatrix *m1, CMatrix *m2) {
   int n = m2->cols;
   int r = m2->rows;
 
-  for (int i = 0; i < m; i++) {
+  for (int j = 0; j < n; j++) {
     for (int k = 0; k < r; k++) {
-      for (int j = 0; j < n; j++) {
+      for (int i = 0; i < m; i++) {
         MATRIX_ITEM(result, i, j) += MATRIX_ITEM(m1, i, k) * MATRIX_ITEM(m2, k, j);
       }
     }
