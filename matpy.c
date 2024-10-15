@@ -96,40 +96,6 @@ PyObject* pymatrix_matmul(PyObject* self, PyObject* other) {
   matrix_matmul(((MatrixObject*) result)->matrix, m1, m2);
   return result;
 }
-/**** START MATMUL VARIANTS ****/
-
-#define _mmul(suffix) int _matrix_matmul_##suffix(CMatrix* result, CMatrix* m1, CMatrix* m2); \ 
-PyObject* _pymatrix_matmul_ ## suffix(PyObject* self, PyObject* other) { \
-  return _pymatrix_matmul_general(self, other, _matrix_matmul_ ## suffix); \
-}
-#define _mmul_meth(suffix) {"mul_" #suffix, (PyCFunction)  _pymatrix_matmul_ ## suffix, METH_O, ""}
-
-PyObject* _pymatrix_matmul_general(PyObject* self, PyObject* other, int (*mm_func)(CMatrix*, CMatrix*, CMatrix*) ) {
-
-  CMatrix* m1 = ((MatrixObject*) self)->matrix;
-  CMatrix* m2 = ((MatrixObject*) other)->matrix;
-  if (!(m1->cols == m2->rows)) {
-    PyErr_SetString(MatrixError, "Dimensions mismatch");
-    return NULL;
-  }
-  PyObject* result = _pymatrix_construct(&MatrixType, m1->rows, m2->cols);
-  if (result == NULL) {
-    return NULL;
-  }
-  mm_func(((MatrixObject*) result)->matrix, m1, m2);
-  return result;
-}
-
-
-_mmul(1_ikj)
-_mmul(2_kji)
-_mmul(2_jki)
-_mmul(3_kji_unrolled)
-_mmul(4_register_blocked)
-_mmul(5_loops)
-
-/**** END MATMUL VARIANTS ****/
-
 
 PyObject* pymatrix_fill(PyTypeObject* type, PyObject* args) {
   int rows, cols;
@@ -212,15 +178,6 @@ static PyMethodDef pymatrix_methods[] = {
     METH_CLASS | METH_VARARGS, "Create matrix filled with the specified value"},
   {"rand", (PyCFunction) pymatrix_rand,
     METH_CLASS | METH_VARARGS | METH_KEYWORDS, "Create matrix filled with random values"},
-
-  /* DELETE from here */
-  _mmul_meth(1_ikj),
-  _mmul_meth(2_kji),
-  _mmul_meth(2_jki),
-  _mmul_meth(3_kji_unrolled),
-  _mmul_meth(4_register_blocked),
-  _mmul_meth(5_loops),
-  /* TO here */
   {NULL}, /* Terminator */
 };
 

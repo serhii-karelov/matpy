@@ -72,12 +72,3 @@ class Matrix:
     def __repr__(self):
         return f'Matrix({self._items})'
 
-"""
-m1 = Matrix.fill(1000, 1000, 800.1)
-m2 = Matrix.fill(1000, 1000, 900.1)
-
-
-#print(" matmul is done in %f s" % timeit(lambda: mv1 @ mv2, number=1))
-print(" add is done in %f s" % timeit(lambda: m1 + m2, number=1))
-print(" add is done in %f s" % timeit(lambda: m1 @ m2, number=1))
-"""

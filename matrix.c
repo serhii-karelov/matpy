@@ -106,113 +106,6 @@ int matrix_mul(CMatrix *result, CMatrix *m1, CMatrix *m2) {
 int matrix_matmul(CMatrix *result, CMatrix *m1, CMatrix *m2) {
   return  _matrix_matmul_5_loops(result, m1, m2);
 }
-int _matrix_matmul_1_ikj(CMatrix *result, CMatrix *m1, CMatrix *m2) {
-  if (!((result->rows == m1->rows)
-        && (result->cols == m2->cols)
-        && (m1->cols == m2->rows))) {
-    return -1;
-  }
-  double a, b;
-  int m = m1->rows;
-  int n = m2->cols;
-  int r = m2->rows;
-
-  double *A = m1->items;
-  double *B = m2->items; 
-  double *C = result->items;
-
-  for (int i = 0; i < m; i++) {
-    for (int k = 0; k < r; k++) {
-      a = ITEM(A, m, i, k);
-      for (int j = 0; j < n; j++) {
-        b = ITEM(B, r, k, j);
-        ITEM(C, m, i, j) += a * b;
-      }
-    }
-  }
-  return 0;
-}
-
-int _matrix_matmul_2_jki(CMatrix *result, CMatrix *m1, CMatrix *m2) {
-  if (!((result->rows == m1->rows)
-        && (result->cols == m2->cols)
-        && (m1->cols == m2->rows))) {
-    return -1;
-  }
-  double a, b;
-  int m = m1->rows; // ldA, ldC
-  int n = m2->cols; 
-  int r = m2->rows; // ldB
-
-  double *A = m1->items;
-  double *B = m2->items; 
-  double *C = result->items;
-
-  for (int k = 0; k < n; k++) {
-    for (int j = 0; j < r; j++) {
-      b = ITEM(B, n, k, j);
-      for (int i = 0; i < m; i++) {
-        a = ITEM(A, m, i, k);
-        ITEM(C, m, i, j) += a * b;
-      }
-    }
-  }
-  return 0;
-}
-
-int _matrix_matmul_2_kji(CMatrix *result, CMatrix *m1, CMatrix *m2) {
-  if (!((result->rows == m1->rows)
-        && (result->cols == m2->cols)
-        && (m1->cols == m2->rows))) {
-    return -1;
-  }
-  double a, b;
-  int k;
-  for (k = 0; k < m2->cols; k++) {
-    for (int j = 0; j < m1->cols; j++) {
-      b = MATRIX_ITEM(m2, j, k);
-      for (int i = 0; i < m1->rows; i++) {
-        a = MATRIX_ITEM(m1, i, j);
-        MATRIX_ADDSET(result, i, k, a * b);
-      }
-    }
-  }
-  return 0;
-}
-
-int _matrix_matmul_3_kji_unrolled(CMatrix *result, CMatrix *m1, CMatrix *m2) {
-  if (!((result->rows == m1->rows)
-        && (result->cols == m2->cols)
-        && (m1->cols == m2->rows))) {
-    return -1;
-  }
-  double a[4], b;
-  int i;
-  for (int k = 0; k < m2->cols; k++) {
-    for (int j = 0; j < m1->cols; j++) {
-      b = MATRIX_ITEM(m2, j, k);
-      for (i = 0; i < m1->rows - 4; i += 4) {
-        a[0] = MATRIX_ITEM(m1, i, j);
-        a[1] = MATRIX_ITEM(m1, i + 1, j);
-        a[2] = MATRIX_ITEM(m1, i + 2, j);
-        a[3] = MATRIX_ITEM(m1, i + 3, j);
-        MATRIX_ADDSET(result, i, k,     a[0] * b);
-        MATRIX_ADDSET(result, i + 1, k, a[1] * b);
-        MATRIX_ADDSET(result, i + 2, k, a[2] * b);
-        MATRIX_ADDSET(result, i + 3, k, a[3] * b);
-      }
-      for (; i < m1->rows; i++) {
-        a[0] = MATRIX_ITEM(m1, i, j);
-        MATRIX_ADDSET(result, i, k, a[0] * b);
-      } 
-    }
-  }
-  return 0;
-}
-
-
-void _matmul_block(int m, int n, int r, int ldA, int ldB, int ldC, double *res, double *block1, double *block2);
-
 int _matrix_matmul_5_loops(CMatrix *result, CMatrix *m1, CMatrix *m2) {
   if (!((result->rows == m1->rows)
         && (result->cols == m2->cols)
@@ -301,26 +194,6 @@ void _matmul_remainder(int start_i, int start_j, CMatrix *result, CMatrix *m1, C
   }
 }
 
-int _matrix_matmul_4_register_blocked(CMatrix *result, CMatrix *m1, CMatrix *m2) {
-  // Use alternative notation: C_ij += A_ik * B_kj
-  if (!((result->rows == m1->rows)
-        && (result->cols == m2->cols)
-        && (m1->cols == m2->rows))) {
-    return -1;
-  }
-  double *a;
-  double *b;
-  for (int i = 0; i < m1->rows / b_m * b_m; i += b_m) {
-#pragma omp parallel for
-    for (int j = 0; j < m2->cols / b_n * b_n; j += b_n)  {
-      a = &MATRIX_ITEM(m1, i, 0);
-      b = &MATRIX_ITEM(m2, 0, j);
-      _matmul_kernel_12x4(m1->cols, a, m1->rows, b, m2->rows,  &MATRIX_ITEM(result, i, j), result->rows); 
-    }
-  }
-  _matmul_remainder(m1->rows / b_m * b_m, m2->cols / b_n * b_n, result, m1, m2);
-  return 0;
-}
 void _matmul_kernel_12x4(int r, double *A, int ldA, double *B, int ldB, double *C, int ldC) {
   /* Load micro-tile in the registers */
   __m256d C_0 = _mm256_loadu_pd(&ITEM(C, ldC, 0, 0)); 
@@ -374,58 +247,5 @@ void _matmul_kernel_12x4(int r, double *A, int ldA, double *B, int ldB, double *
   _mm256_storeu_pd(&ITEM(C, ldC, 8, 1), C_9);
   _mm256_storeu_pd(&ITEM(C, ldC, 8, 2), C_10);
   _mm256_storeu_pd(&ITEM(C, ldC, 8, 3), C_11);
-}
-
-void _matmul_kernel_4x4(int r, double *A, int ldA, double *B, int ldB, double *C, int ldC) {
-  /* Load micro-tile in the registers */
-  __m256d C_0 = _mm256_loadu_pd(&ITEM(C, ldC, 0, 0)); 
-  __m256d C_1 = _mm256_loadu_pd(&ITEM(C, ldC, 0, 1)); 
-  __m256d C_2 = _mm256_loadu_pd(&ITEM(C, ldC, 0, 2)); 
-  __m256d C_3 = _mm256_loadu_pd(&ITEM(C, ldC, 0, 3)); 
-  for (int k = 0; k < r; k++) {
-    /* Scalar from matrix B. Used to implement rank-1 multiplication */
-    __m256d scalar; 
-    __m256d A_col = _mm256_loadu_pd(&ITEM(A, ldA, 0, k));
-
-    scalar = _mm256_broadcast_sd(&ITEM(B, ldB, k, 0));
-    C_0 = _mm256_fmadd_pd(A_col, scalar, C_0); 
-
-    scalar = _mm256_broadcast_sd(&ITEM(B, ldB, k, 1));
-    C_1 = _mm256_fmadd_pd(A_col, scalar, C_1); 
-
-    scalar = _mm256_broadcast_sd(&ITEM(B, ldB, k, 2));
-    C_2 = _mm256_fmadd_pd(A_col, scalar, C_2); 
-
-    scalar = _mm256_broadcast_sd(&ITEM(B, ldB, k, 3));
-    C_3 = _mm256_fmadd_pd(A_col, scalar, C_3); 
-  }
-  _mm256_storeu_pd(&ITEM(C, ldC, 0, 0), C_0);
-  _mm256_storeu_pd(&ITEM(C, ldC, 0, 1), C_1);
-  _mm256_storeu_pd(&ITEM(C, ldC, 0, 2), C_2);
-  _mm256_storeu_pd(&ITEM(C, ldC, 0, 3), C_3);
-}
-
-void _matmul_block(int m, int n, int r, int ldA, int ldB, int ldC, double *res, double *block1, double *block2) {
-  if (m == 4) {
-    for (int j = 0; j < r; j++) {
-      for (int k = 0; k < n; k++) {
-          double b = ITEM(block2, ldB, k, j);
-          ITEM(res, ldC, 0, j) += ITEM(block1, ldA, 0, k) * b;
-          ITEM(res, ldC, 1, j) += ITEM(block1, ldA, 1, k) * b;
-          ITEM(res, ldC, 2, j) += ITEM(block1, ldA, 2, k) * b;
-          ITEM(res, ldC, 3, j) += ITEM(block1, ldA, 3, k) * b;
-      }
-    }
-    return;
-    
-  }
-  for (int j = 0; j < r; j++) {
-    for (int k = 0; k < n; k++) {
-      double b = ITEM(block2, ldB, k, j);
-      for (int i = 0; i < m; i++) {
-        ITEM(res, ldC, i, j) += ITEM(block1, ldA, i, k) * b;
-      }
-    }
-  }
 }
 

@@ -69,31 +69,3 @@ def test_large_matrix_matmul(Matrix):
     for row in range(len(result)):
         assert pytest.approx(result[row]) == c[row].tolist()
 
-# TEST MATMUL VARIATIONS
-_VARIATION_METHODS = [
-    'mul_1_ikj',
-    'mul_2_kji',
-    'mul_3_kji_unrolled',
-    'mul_4_register_blocked',
-]
-def test_matmul_variations_small(Matrix):
-    m1 = matpy.Matrix([[1, 2, 3], [4, 5, 6]])
-    m2 = matpy.Matrix(([[10, 40], [20, 50], [30, 60]]))
-    expected = [[140, 320], [320, 770]]
-    for meth in _VARIATION_METHODS:
-        result = getattr(m1, meth)(m2)
-        assert result.as_list() == expected, f"Multipling via {meth}"
-
-def test_matmul_variations_large(Matrix):
-    np.random.seed(42)
-    a = np.random.rand(127, 131) 
-    b = np.random.rand(131, 199) 
-    c = a @ b
-    m1 = matpy.Matrix(a.tolist())
-    m2 = matpy.Matrix(b.tolist())
-    for meth in _VARIATION_METHODS:
-        result = getattr(m1, meth)(m2)
-        result = result.as_list()
-        for row in range(len(result)):
-            assert pytest.approx(result[row]) == c[row].tolist(), f"Multipling via {meth}"
-
