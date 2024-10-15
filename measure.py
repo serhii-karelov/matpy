@@ -22,8 +22,8 @@ def measure_matpy(times=1):
 
 if __name__ == "__main__":
     mmul, madd = measure_vanilla(times=1)
+    print(f"pure-python is done: {(mmul):.2f}s \t add: {madd:.3f}s")
     mmul, madd = measure_matpy(times=10)
-
-    print(f"matpy matmul matmul: {(mmul):.2f}s \t add: {madd:.3f}s")
+    print(f"matpy matmul is done: {(mmul):.2f}s \t add: {madd:.3f}s")
 
 
