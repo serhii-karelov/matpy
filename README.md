@@ -7,8 +7,6 @@ multiplication based on the ideas from the BLIS project (
 The library provides built-in `Matrix` type, that can be imported and used in Python. 
 The type itself and underlying algorithms are implemented in C. It is 1400x faster than pure-python implementation. 
 
-The library written and published as part of series of articles I am writing right now where I teach computer science topics (coming this month). 
-
 ### Ideas implemented in this project
 - Instruction level paralellism (SIMD).
 - Thread parallelism.
